@@ -4,8 +4,8 @@ USE IEEE.numeric_std.ALL;
 
 ENTITY RoutingUnit IS
     GENERIC (
-        X : unsigned(1 DOWNTO 0) := "00";
-        Y : unsigned(1 DOWNTO 0) := "00"
+        X : INTEGER := 0;
+        Y : INTEGER := 0
     );
     PORT (
         DataIn : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -23,36 +23,50 @@ ENTITY RoutingUnit IS
 END ENTITY RoutingUnit;
 
 ARCHITECTURE Struct OF RoutingUnit IS
-    SIGNAL UXT, UYT : unsigned(1 DOWNTO 0);
+    SIGNAL XTarget, YTarget : INTEGER;
 BEGIN
-    UXT <= unsigned(DataIn(15 DOWNTO 14));
-    UYT <= unsigned(DataIn(13 DOWNTO 14));
+    XTarget <= to_integer(unsigned(DataIn(15 DOWNTO 14)));
+    YTarget <= to_integer(unsigned(DataIn(13 DOWNTO 12)));
 
-    IF UXT = X AND UYT = Y THEN
+    PROCESS (DataIn, XTarget, YTarget)
+    BEGIN
 
-        DataOutPE <= DataIn;
-        EnableOutPE <= '1';
+        DataOutU <= (OTHERS => '0');
+        EnableOutU <= '0';
+        DataOutD <= (OTHERS => '0');
+        EnableOutD <= '0';
+        DataOutL <= (OTHERS => '0');
+        EnableOutL <= '0';
+        DataOutR <= (OTHERS => '0');
+        EnableOutR <= '0';
+        DataOutPe <= (OTHERS => '0');
+        EnableOutPE <= '0';
 
-    ELSE
+        IF XTarget = X AND YTarget = Y THEN
 
-        IF UXT = X THEN
+            DataOutPE <= DataIn;
+            EnableOutPE <= '1';
 
-            IF UYT < Y THEN
-                DataOutD <= DataIn;
-                EnableOutD <= '1';
+        ELSE
+
+            IF XTarget = X THEN
+
+                IF YTarget < Y THEN
+                    DataOutD <= DataIn;
+                    EnableOutD <= '1';
+                ELSE
+                    DataOutU <= DataIn;
+                    EnableOutU <= '1';
+                END IF;
+
+            ELSIF XTarget < X THEN
+                DataOutL <= DataIn;
+                EnableOutL <= '1';
             ELSE
-                DataOutU <= DataIn;
-                EnableOutU <= '1';
+                DataOutR <= DataIn;
+                EnableOutR <= '1';
             END IF;
 
-        ELSIF UXT < X THEN
-            DataOutL <= DataIn;
-            EnableOutL <= '1';
-        ELSE
-            DataOutR <= DataIn;
-            EnableOutR <= '1';
         END IF;
-
-    END IF;
-
+    END PROCESS;
 END Struct;
