@@ -25,8 +25,8 @@ END ENTITY RoutingUnit;
 ARCHITECTURE Struct OF RoutingUnit IS
     SIGNAL XTarget, YTarget : INTEGER;
 BEGIN
-    XTarget <= to_integer(unsigned(DataIn(15 DOWNTO 14)));
-    YTarget <= to_integer(unsigned(DataIn(13 DOWNTO 12)));
+    YTarget <= to_integer(unsigned(DataIn(15 DOWNTO 14)));
+    XTarget <= to_integer(unsigned(DataIn(13 DOWNTO 12)));
 
     PROCESS (DataIn, XTarget, YTarget)
     BEGIN
